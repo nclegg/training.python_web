@@ -20,7 +20,7 @@ def client(msg, log_buffer=sys.stderr):
 
         while not done:
             chunk = sock.recv(buffer_size)
-            print >>log_buffer, 'received "{0}"'.format(chunk)  # ORIGINAL
+            print >>log_buffer, 'received "{0}"'.format(chunk)
 
             # test last bytes received
             if len(chunk) < buffer_size:

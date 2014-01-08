@@ -9,7 +9,7 @@ def server(log_buffer=sys.stderr):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP) 
 
 
-    # allow imediate socket reuse http://docs.python.org/2/library/socket.html
+    # allow imediate socket re-use http://docs.python.org/2/library/socket.html
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     
     # log that we are building a server
@@ -28,14 +28,8 @@ def server(log_buffer=sys.stderr):
                 print >>log_buffer, 'connection - {0}:{1}'.format(*addr)
 
                 while True:
-
                     data = conn.recv(16)
                     print >>log_buffer, 'received "{0}"'.format(data)
-
-                    # TODO: you will need to check here to see if any data was
-                    #       received.  If so, send the data you got back to 
-                    #       the client.  If not, exit the inner loop and wait
-                    #       for a new connection from a client
            
                     if not data:
                         break
@@ -44,8 +38,6 @@ def server(log_buffer=sys.stderr):
             finally:
                 conn.close()
                 print >>log_buffer, 'closing socket'
-
-
             
     except KeyboardInterrupt:
         sock.close()

@@ -1,15 +1,18 @@
 import socket
 import sys
+import os 
+import mimetypes
 
 
-def response_ok():
-    """returns a basic HTTP response"""
-    resp = []
-    resp.append("HTTP/1.1 200 OK")
-    resp.append("Content-Type: text/plain")
-    resp.append("")
-    resp.append("this is a pretty minimal response")
-    return "\r\n".join(resp)
+
+def response_ok(body, mimetype):
+    """returns the HTTP resource and mime-type"""
+    response = [ "HTTP/1.1 200 OK",
+                 "Content-Type: %s"  % mimetype,
+                 "",
+                 body
+               ]
+    return "\r\n".join(response)
 
 
 def response_method_not_allowed():
@@ -19,13 +22,41 @@ def response_method_not_allowed():
     resp.append("")
     return "\r\n".join(resp)
 
+def response_not_found():
+    """returns a 404 Not Found response"""
+    resp = []
+    resp.append("HTTP/1.1 404 Not Found")
+    resp.append("")
+    return "\r\n".join(resp)
+
 
 def parse_request(request):
     first_line = request.split("\r\n", 1)[0]
     method, uri, protocol = first_line.split()
     if method != "GET":
         raise NotImplementedError("We only accept GET")
-    print >>sys.stderr, 'request is okay'
+    return uri
+
+
+def resolve_uri(uri):
+    home_dir = "webroot"
+
+    # adjust domain root index
+    uri = home_dir if uri == '/' else home_dir + uri
+
+    if not os.path.exists(uri):
+        raise ValueError("File not found")
+
+    body = ""
+    mimetype = ""
+
+    if os.path.isdir(uri):
+        mimetype = "text/plain"
+        body = '\n'.join(os.listdir(uri))
+    elif os.path.isfile(uri):
+        mimetype = mimetypes.guess_type(uri)[0]
+        body = open(uri, 'rb').read()
+    return body, mimetype
 
 
 def server():
@@ -48,13 +79,17 @@ def server():
                     request += data
                     if len(data) < 1024 or not data:
                         break
-
                 try:
-                    parse_request(request)
+                    uri = parse_request(request)
+                    print >>sys.stderr, uri,  '****uri'
+                    body, mimetype = resolve_uri(uri)
+                    response = response_ok(body, mimetype)
                 except NotImplementedError:
                     response = response_method_not_allowed()
-                else:
-                    response = response_ok()
+#                except IOError:
+#                    response = response_not_found()
+                except ValueError:
+                    response = response_not_found()
 
                 print >>sys.stderr, 'sending response'
                 conn.sendall(response)

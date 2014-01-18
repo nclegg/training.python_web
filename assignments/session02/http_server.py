@@ -86,8 +86,6 @@ def server():
                     response = response_ok(body, mimetype)
                 except NotImplementedError:
                     response = response_method_not_allowed()
-#                except IOError:
-#                    response = response_not_found()
                 except ValueError:
                     response = response_not_found()
 

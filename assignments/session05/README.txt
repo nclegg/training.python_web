@@ -1,6 +1,8 @@
 
 Running the microblog.py server.
 
+Make sure Flask is installed in your virtual environment.
+
 Create a database by opening a python interpreter in the 'microblog'
 directory and typing:
 

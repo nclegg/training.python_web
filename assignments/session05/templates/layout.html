@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Microblog!</title>
+     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1>My Microblog</h1>
+    <div class="content">
+
+    {% if not session.logged_in %}
+       <a href="{{ url_for('login') }}">log in</a>
+    {% else %}
+       <a href="{{ url_for('logout') }}">log out</a>
+    {% endif %}
+
+    {% for message in get_flashed_messages() %}
+       <div class=flash>{{ message }}</div>
+    {% endfor %}
+
+    {% block body %}{% endblock %}
+
+    </div>
+  </body>
+</html>
